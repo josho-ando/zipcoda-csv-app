@@ -47,10 +47,10 @@ if uploaded_file is not None:
     df = load_csv(uploaded_file)
     st.write("CSVプレビュー", df.head())
 
-    address_col = st.number_input("住所が含まれる列番号を指定（0から始まる）", min_value=0, max_value=len(df.columns)-1, value=0)
+    address_col = st.number_input("住所が含まれる列番号を指定（1から）", min_value=1, max_value=len(df.columns), value=1)
 
     if st.button("郵便番号を付与する"):
-        addresses = df.iloc[:, address_col].astype(str)
+        addresses = df.iloc[:, address_col - 1].astype(str)
         cleaned_addresses = addresses.map(extract_up_to_banchi)
 
         st.write("抽出された番地までの住所（デバッグ表示）", cleaned_addresses.head(10))
