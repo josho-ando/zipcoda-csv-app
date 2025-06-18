@@ -81,9 +81,14 @@ st.title("住所→郵便番号 変換アプリ（Zipcoda連携）")
 
 uploaded_file = st.file_uploader("CSVファイルをアップロードしてください", type=["csv"])
 if uploaded_file is not None:
-    # .read() は1回だけ
-    raw_data = uploaded_file.read()
-    df = load_csv(io.BytesIO(raw_data))
+    df = load_csv(uploaded_file)
+    st.write("CSVプレビュー", df.head())  # ← これが戻ってきます！
+
+# uploaded_file = st.file_uploader("CSVファイルをアップロードしてください", type=["csv"])
+# if uploaded_file is not None:
+#     # .read() は1回だけ
+#     raw_data = uploaded_file.read()
+#     df = load_csv(io.BytesIO(raw_data))
 
     address_col = st.number_input("住所が含まれる列番号を指定（1から）", min_value=1, max_value=len(df.columns), value=1)
 
