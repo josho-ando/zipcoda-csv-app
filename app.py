@@ -7,11 +7,11 @@ import re
 
 # 番地まで抽出する関数（漢字 & ハイフン形式対応）
 def extract_up_to_banchi(address):
-    pattern1 = r'^.*?\d{1,5}[-－]\d{1,5}([-－]\d{1,5})?'
-    pattern2 = r'^.*?\d{1,5}丁目\d{1,5}番地(\d{1,5}号)?'
-    pattern3 = r'^.*?\d{1,5}丁目\d{1,5}番(\d{1,5}号)?'
+    pattern1 = r'\d{1,5}[-－]\d{1,5}([-－]\d{1,5})?'
+    pattern2 = r'\d{1,5}丁目\d{1,5}番地(\d{1,5}号)?'
+    pattern3 = r'\d{1,5}丁目\d{1,5}番(\d{1,5}号)?'
     for pattern in [pattern2, pattern3, pattern1]:
-         match = re.search(pattern, address)
+        match = re.search(pattern, address)
         if match:
             end = match.end()
             return address[:end]
