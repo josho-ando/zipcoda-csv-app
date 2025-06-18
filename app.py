@@ -30,22 +30,22 @@ def get_zipcode(address):
         return "取得失敗"
 
 # CSVの文字コードを自動判別して読み込む
-def load_csv(filelike):
-    raw = filelike.read()
+def load_csv(file):
+    raw = file.read()
 
-    # まず UTF-8-SIG で試す（Excelで保存されたCSVに多い）
+    # UTF-8-SIG（Excelなど）で試行
     try:
         return pd.read_csv(io.BytesIO(raw), encoding='utf-8-sig')
     except Exception:
         pass
 
-    # 次に Shift_JIS（cp932）で試す
+    # Shift_JIS（CP932）で試行
     try:
         return pd.read_csv(io.BytesIO(raw), encoding='cp932')
     except Exception:
         pass
 
-    # それでも無理なら chardet で推定
+    # chardetで自動判定
     encoding = chardet.detect(raw)['encoding']
     try:
         return pd.read_csv(io.BytesIO(raw), encoding=encoding)
@@ -53,14 +53,28 @@ def load_csv(filelike):
         st.error("CSVの読み込みに失敗しました。文字コードが不正か、破損している可能性があります。")
         return pd.DataFrame()
 
-# def load_csv(file):
-#     raw = file.read()
+# def load_csv(filelike):
+#     raw = filelike.read()
+
+#     # まず UTF-8-SIG で試す（Excelで保存されたCSVに多い）
+#     try:
+#         return pd.read_csv(io.BytesIO(raw), encoding='utf-8-sig')
+#     except Exception:
+#         pass
+
+#     # 次に Shift_JIS（cp932）で試す
+#     try:
+#         return pd.read_csv(io.BytesIO(raw), encoding='cp932')
+#     except Exception:
+#         pass
+
+#     # それでも無理なら chardet で推定
 #     encoding = chardet.detect(raw)['encoding']
 #     try:
-#         df = pd.read_csv(io.BytesIO(raw), encoding=encoding)
-#     except:
-#         df = pd.read_csv(io.BytesIO(raw), encoding='utf-8', errors='replace')
-#     return df
+#         return pd.read_csv(io.BytesIO(raw), encoding=encoding)
+#     except Exception:
+#         st.error("CSVの読み込みに失敗しました。文字コードが不正か、破損している可能性があります。")
+#         return pd.DataFrame()
 
 # Streamlit UI
 st.title("住所→郵便番号 変換アプリ（Zipcoda連携）")
@@ -70,11 +84,6 @@ if uploaded_file is not None:
     # .read() は1回だけ
     raw_data = uploaded_file.read()
     df = load_csv(io.BytesIO(raw_data))
-
-# uploaded_file = st.file_uploader("CSVファイルをアップロードしてください", type=["csv"])
-# if uploaded_file is not None:
-#     df = load_csv(uploaded_file)
-#     st.write("CSVプレビュー", df.head())
 
     address_col = st.number_input("住所が含まれる列番号を指定（1から）", min_value=1, max_value=len(df.columns), value=1)
 
