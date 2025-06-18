@@ -19,11 +19,14 @@ def extract_up_to_banchi(address):
 # 郵便番号取得関数（Zipcoda API）
 def get_zipcode(address):
     try:
-        res = requests.get(f'https://api.zipcoda.net/?query={address}')
-        data = res.json()
-        return data['items'][0]['zipcode'] if data['status'] == 200 and data['items'] else ''
-    except Exception as e:
-        return ''
+        response = requests.get("https://zipcoda.net/api", params={"address": address})
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("items", [{}])[0].get("zipcode", "該当なし")
+        else:
+            return "APIエラー"
+    except Exception:
+        return "取得失敗"
 
 # CSVの文字コードを自動判別して読み込む
 def load_csv(file):
@@ -44,7 +47,7 @@ if uploaded_file is not None:
     st.write("CSVプレビュー", df.head())
 
     address_col = st.number_input("住所が含まれる列番号を指定（0から始まる）", min_value=0, max_value=len(df.columns)-1, value=0)
-    
+
     if st.button("郵便番号を付与する"):
         addresses = df.iloc[:, address_col].astype(str)
         cleaned_addresses = addresses.map(extract_up_to_banchi)
