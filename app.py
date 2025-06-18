@@ -11,9 +11,10 @@ def extract_up_to_banchi(address):
     pattern2 = r'^.*?\d{1,5}丁目\d{1,5}番地(\d{1,5}号)?'
     pattern3 = r'^.*?\d{1,5}丁目\d{1,5}番(\d{1,5}号)?'
     for pattern in [pattern2, pattern3, pattern1]:
-        match = re.match(pattern, address)
+         match = re.search(pattern, address)
         if match:
-            return match.group()
+            end = match.end()
+            return address[:end]
     return address
 
 # 郵便番号取得関数（Zipcoda API）
@@ -51,9 +52,13 @@ if uploaded_file is not None:
     if st.button("郵便番号を付与する"):
         addresses = df.iloc[:, address_col].astype(str)
         cleaned_addresses = addresses.map(extract_up_to_banchi)
+
+        st.write("抽出された番地までの住所（デバッグ表示）", cleaned_addresses.head(10))
+
         zipcodes = cleaned_addresses.map(get_zipcode)
         df['郵便番号'] = zipcodes
 
+        
         st.success("処理完了！結果を以下に表示します。")
         st.dataframe(df)
 
